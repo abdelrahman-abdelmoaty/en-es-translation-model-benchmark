@@ -24,6 +24,9 @@ RUN git lfs install
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Create model directory
+RUN mkdir -p /app/model
+
 # Copy entire app directory first (to get .git if available for LFS)
 COPY . /tmp/repo
 
