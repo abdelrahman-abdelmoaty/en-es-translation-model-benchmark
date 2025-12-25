@@ -20,15 +20,27 @@ RUN apt-get update && apt-get install -y \
 # Initialize git-lfs
 RUN git lfs install
 
-# Copy requirements and install Python dependencies
+# Copy requirements and install Python dependencies (including huggingface-hub for model download)
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt huggingface-hub
 
 # Create model directory
 RUN mkdir -p /app/model
 
-# Copy model directory (Railway's buildCommand should have pulled LFS files already)
-COPY transformer-model /app/model/transformer-model
+# Copy model directory to check if files are LFS pointers
+COPY transformer-model /tmp/model-check
+
+# Check if model file is LFS pointer or actual file, download from Hugging Face if needed
+RUN MODEL_SIZE=$(stat -c%s /tmp/model-check/tf_model.h5 2>/dev/null || echo 0) && \
+    if [ "$MODEL_SIZE" -lt 1000000 ]; then \
+      echo "Model file is LFS pointer ($MODEL_SIZE bytes) or missing"; \
+      echo "Downloading model from Hugging Face..."; \
+      python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='Helsinki-NLP/opus-mt-en-es', local_dir='/app/model/transformer-model', local_dir_use_symlinks=False)"; \
+    else \
+      echo "Model file is actual file ($MODEL_SIZE bytes), using local copy..."; \
+      cp -r /tmp/model-check /app/model/transformer-model; \
+    fi && \
+    rm -rf /tmp/model-check
 
 # Verify critical model files exist and are not LFS pointers
 RUN echo "Verifying model files..." && \
