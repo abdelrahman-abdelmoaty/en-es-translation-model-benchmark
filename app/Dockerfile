@@ -76,7 +76,7 @@ COPY frontend /usr/share/nginx/html
 RUN rm -f /etc/nginx/sites-enabled/default
 
 # Copy nginx config
-COPY nginx.render.conf /etc/nginx/conf.d/default.conf
+COPY nginx.railway.conf /etc/nginx/conf.d/default.conf
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
