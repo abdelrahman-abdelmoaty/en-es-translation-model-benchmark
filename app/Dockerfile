@@ -82,8 +82,10 @@ COPY nginx.railway.conf /etc/nginx/conf.d/default.conf
 RUN echo '#!/bin/bash\n\
 set -e\n\
 PORT=${PORT:-80}\n\
-# Update nginx to listen on Railway PORT\n\
+echo "Using PORT=$PORT"\n\
+# Update nginx to listen on Railway PORT and bind to all interfaces\n\
 sed -i "s/listen 80/listen $PORT/" /etc/nginx/conf.d/default.conf\n\
+sed -i "s/server_name localhost;/server_name _;/" /etc/nginx/conf.d/default.conf\n\
 # Test nginx config\n\
 nginx -t\n\
 # Start FastAPI in background\n\
@@ -105,7 +107,7 @@ for i in {1..60}; do\n\
   sleep 1\n\
 done\n\
 # Start nginx in foreground\n\
-echo "Starting nginx..."\n\
+echo "Starting nginx on port $PORT..."\n\
 exec nginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
 
 EXPOSE 80 8000
