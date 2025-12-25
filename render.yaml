@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: translation-app
+    env: docker
+    dockerfilePath: ./app/Dockerfile.render
+    dockerContext: ./app
+    plan: standard # Standard plan recommended for model loading
+    envVars:
+      - key: MODEL_PATH
+        value: /app/model/transformer-model
+      - key: PORT
+        value: 80
+      - key: MAX_LENGTH
+        value: 50
+      - key: NUM_BEAMS
+        value: 4
+    healthCheckPath: /api/health

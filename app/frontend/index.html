@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>English to Spanish Translator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🌍 English to Spanish Translator</h1>
+      </header>
+
+      <main>
+        <div class="translation-box">
+          <div class="input-section">
+            <label for="english-input">English Text</label>
+            <textarea
+              id="english-input"
+              placeholder="Enter English text to translate..."
+              rows="6"
+            ></textarea>
+            <div class="button-container">
+              <button id="translate-btn" class="translate-button">
+                <span id="btn-text">Translate</span>
+                <span id="btn-spinner" class="spinner hidden"></span>
+              </button>
+              <button id="clear-btn" class="clear-button">Clear</button>
+            </div>
+          </div>
+
+          <div class="output-section">
+            <label for="spanish-output">Spanish Translation</label>
+            <textarea
+              id="spanish-output"
+              placeholder="Translation will appear here..."
+              rows="6"
+              readonly
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="suggestions-section">
+          <label class="suggestions-label">Try these examples:</label>
+          <div class="suggestions-grid" id="suggestions-grid">
+            <!-- Suggestions will be added by JavaScript -->
+          </div>
+        </div>
+
+        <div id="error-message" class="error-message hidden"></div>
+      </main>
+
+      <footer>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
