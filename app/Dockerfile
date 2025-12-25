@@ -27,22 +27,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Create model directory
 RUN mkdir -p /app/model
 
-# Copy entire app directory first (to get .git if available for LFS)
-COPY . /tmp/repo
+# Copy model directory - Railway should have pulled LFS files already
+# If files are LFS pointers, we'll detect and fail with clear error
+COPY transformer-model /app/model/transformer-model
 
-# Pull Git LFS files if .git exists, otherwise copy model directory
-RUN if [ -d /tmp/repo/.git ]; then \
-      cd /tmp/repo && \
-      git lfs install && \
-      git lfs pull && \
-      cp -r transformer-model /app/model/transformer-model; \
-    else \
-      echo "No .git found, copying model files directly"; \
-      cp -r /tmp/repo/transformer-model /app/model/transformer-model || \
-      (echo "ERROR: Model files not found. Listing:" && ls -la /tmp/repo/ && exit 1); \
-    fi
-
-# Verify critical model files exist and have content
+# Verify critical model files exist and are not LFS pointers
 RUN echo "Verifying model files..." && \
     ls -lh /app/model/transformer-model/ && \
     if [ ! -f /app/model/transformer-model/tokenizer_config.json ] || [ ! -s /app/model/transformer-model/tokenizer_config.json ]; then \
@@ -55,11 +44,16 @@ RUN echo "Verifying model files..." && \
     fi && \
     MODEL_SIZE=$(stat -c%s /app/model/transformer-model/tf_model.h5 2>/dev/null || echo 0) && \
     if [ "$MODEL_SIZE" -lt 1000000 ]; then \
-      echo "ERROR: tf_model.h5 too small ($MODEL_SIZE bytes), likely LFS pointer"; \
+      echo "ERROR: tf_model.h5 is only $MODEL_SIZE bytes (expected ~300MB)"; \
+      echo "This appears to be a Git LFS pointer file, not the actual model."; \
+      echo "Railway needs to pull LFS files before building."; \
+      echo "First 200 bytes of file:"; \
       head -c 200 /app/model/transformer-model/tf_model.h5; \
+      echo ""; \
+      echo "Please ensure Railway is configured to pull Git LFS files."; \
       exit 1; \
     fi && \
-    echo "Model files verified successfully"
+    echo "Model files verified successfully (tf_model.h5 size: $MODEL_SIZE bytes)"
 
 # Copy application code
 COPY backend/app /app/app
