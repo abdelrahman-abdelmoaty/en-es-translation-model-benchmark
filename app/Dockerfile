@@ -27,9 +27,23 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Create model directory
 RUN mkdir -p /app/model
 
-# Copy model directory - Railway should have pulled LFS files already
-# If files are LFS pointers, we'll detect and fail with clear error
-COPY transformer-model /app/model/transformer-model
+# Copy entire app directory to access .git for LFS pull
+COPY . /tmp/build
+
+# Pull Git LFS files if we have access to .git
+RUN cd /tmp/build && \
+    if [ -d .git ]; then \
+      echo "Found .git, pulling LFS files..."; \
+      git lfs install && \
+      git lfs pull && \
+      echo "LFS files pulled successfully"; \
+    else \
+      echo "No .git directory found - Railway should pull LFS files before build"; \
+    fi && \
+    # Copy model files after LFS pull
+    cp -r transformer-model /app/model/transformer-model && \
+    # Clean up
+    rm -rf /tmp/build
 
 # Verify critical model files exist and are not LFS pointers
 RUN echo "Verifying model files..." && \
