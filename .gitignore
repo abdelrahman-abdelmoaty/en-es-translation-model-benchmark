@@ -1,0 +1,42 @@
+# Model files (too large for GitHub - use Git LFS if needed)
+# Uncomment these if NOT using Git LFS:
+# app/transformer-model/*.h5
+# app/transformer-model/*.pkl
+# Keep the directory structure
+!app/transformer-model/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Jupyter Notebooks
+*.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Logs
+*.log
+
+# Model archives
+*.tar.gz
+*.zip
+
