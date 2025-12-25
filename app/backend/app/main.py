@@ -51,12 +51,6 @@ async def startup_event():
         print(f"Failed to load model: {e}")
         raise
 
-# Mount static files (frontend) - must be after API routes
-frontend_path = "/app/frontend"
-if os.path.exists(frontend_path):
-    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
-
-
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """Health check endpoint."""
