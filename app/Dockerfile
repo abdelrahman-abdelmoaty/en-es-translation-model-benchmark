@@ -1,4 +1,4 @@
-# Dockerfile for Railway deployment (combines backend + nginx)
+# Dockerfile for Railway deployment
 FROM python:3.11-slim
 
 # Set working directory
@@ -12,7 +12,6 @@ ENV TF_USE_LEGACY_KERAS=1
 RUN apt-get update && apt-get install -y \
     gcc \
     curl \
-    nginx \
     git \
     git-lfs \
     && rm -rf /var/lib/apt/lists/*
@@ -70,47 +69,10 @@ RUN echo "Verifying model files..." && \
 COPY backend/app /app/app
 
 # Copy frontend
-COPY frontend /usr/share/nginx/html
+COPY frontend /app/frontend
 
-# Remove default nginx site
-RUN rm -f /etc/nginx/sites-enabled/default
+EXPOSE 8000
 
-# Copy nginx config
-COPY nginx.railway.conf /etc/nginx/conf.d/default.conf
-
-# Create startup script
-RUN echo '#!/bin/bash\n\
-set -e\n\
-PORT=${PORT:-80}\n\
-echo "Using PORT=$PORT"\n\
-# Update nginx to listen on Railway PORT and bind to all interfaces\n\
-sed -i "s/listen 80/listen $PORT/" /etc/nginx/conf.d/default.conf\n\
-sed -i "s/server_name localhost;/server_name _;/" /etc/nginx/conf.d/default.conf\n\
-# Test nginx config\n\
-nginx -t\n\
-# Start FastAPI in background\n\
-echo "Starting FastAPI..."\n\
-uvicorn app.main:app --host 0.0.0.0 --port 8000 > /tmp/fastapi.log 2>&1 &\n\
-FASTAPI_PID=$!\n\
-# Wait for FastAPI to be ready (check health endpoint)\n\
-echo "Waiting for FastAPI to start..."\n\
-for i in {1..60}; do\n\
-  if curl -f http://localhost:8000/health > /dev/null 2>&1; then\n\
-    echo "FastAPI is ready!"\n\
-    break\n\
-  fi\n\
-  if [ $i -eq 60 ]; then\n\
-    echo "FastAPI failed to start after 60 seconds. Logs:"\n\
-    cat /tmp/fastapi.log\n\
-    exit 1\n\
-  fi\n\
-  sleep 1\n\
-done\n\
-# Start nginx in foreground\n\
-echo "Starting nginx on port $PORT..."\n\
-exec nginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
-
-EXPOSE 80 8000
-
-CMD ["/start.sh"]
+# Start FastAPI directly using Railway's PORT
+CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
 

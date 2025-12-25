@@ -1,10 +1,12 @@
 """FastAPI application for English to Spanish translation."""
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from .model import translate_text, load_model
 from .config import API_HOST, API_PORT
 import uvicorn
+import os
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -49,6 +51,11 @@ async def startup_event():
         print(f"Failed to load model: {e}")
         raise
 
+# Mount static files (frontend) - must be after API routes
+frontend_path = "/app/frontend"
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
+
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -81,6 +88,12 @@ async def translate(request: TranslationRequest):
             status_code=500,
             detail=f"Translation failed: {str(e)}"
         )
+
+
+# Mount static files (frontend) - must be after all API routes
+frontend_path = "/app/frontend"
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
 
 
 if __name__ == "__main__":

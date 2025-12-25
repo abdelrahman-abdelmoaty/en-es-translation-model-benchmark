@@ -1,5 +1,5 @@
-// API endpoint - adjust if needed
-const API_URL = "/api";
+// API endpoint - direct to FastAPI (no nginx proxy)
+const API_URL = "";
 
 // DOM elements
 const englishInput = document.getElementById("english-input");
