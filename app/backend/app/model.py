@@ -66,10 +66,6 @@ def translate_text(text: str) -> str:
         # Decode output
         translation = _tokenizer.decode(outputs[0], skip_special_tokens=True)
         
-        # Remove leading inverted question mark if present
-        if translation.startswith('¿'):
-            translation = translation[1:].lstrip()
-        
         return translation
         
     except Exception as e:
