@@ -98,7 +98,7 @@ englishInput.addEventListener("keydown", (e) => {
 // Check API health on load
 async function checkHealth() {
   try {
-    const response = await fetch(`${API_URL}/health`);
+    const response = await fetch(`${API_URL}/api/health`);
     if (!response.ok) {
       console.warn("API health check failed");
     }

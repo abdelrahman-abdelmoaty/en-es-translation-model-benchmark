@@ -51,7 +51,7 @@ async def startup_event():
         print(f"Failed to load model: {e}")
         raise
 
-@app.get("/health", response_model=HealthResponse)
+@app.get("/api/health", response_model=HealthResponse)
 async def health_check():
     """Health check endpoint."""
     return HealthResponse(

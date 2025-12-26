@@ -8,7 +8,7 @@ The focus is on comparing different architectures using **BLEU score** as the pr
 ## 🔗 Important Links
 
 - 🌐 **Live Application**: [English to Spanish Translator](https://translation-app-production-0d36.up.railway.app/)
-- 🔌 **Live API**: [API Base URL](https://translation-app-production-0d36.up.railway.app/)
+- 🔌 **Live API**: [API Base URL](https://translation-app-production-0d36.up.railway.app/api)
 - 📄 **Reference**: [TF Tutorial](https://www.tensorflow.org/text/tutorials/nmt_with_attention)
 - 💻 **Model Weights**:
   - **Transformer**: [Transformer (Hilsenki) Weights](https://www.kaggle.com/models/yassienwasfy/transformer/)
@@ -36,59 +36,34 @@ The following table summarizes the BLEU scores obtained by three different model
 
 ## 🚀 Dockerized Translation Web Application
 
-This repository now includes a Dockerized FastAPI backend with a web frontend for English-to-Spanish translation using the Helsinki-NLP transformer model.
+This repository includes a Dockerized FastAPI backend with a web frontend for English-to-Spanish translation using the Helsinki-NLP transformer model.
 
-### Prerequisites
+### Running Locally
 
-- Docker and Docker Compose installed
-- The `app/transformer-model/` directory with extracted model files
+**Prerequisites:**
 
-### Getting the Model Files
+- Docker installed
 
-The transformer model files (~300 MB) are required to run the application. Choose one of the following options:
-
-#### Option 1: Extract from Local Tar File (If you have it)
-
-If you have the `Transformer TensorFlow 2 Default v1.tar.gz` file:
+To run the application locally:
 
 ```bash
-# Extract the model to the app directory
-tar -xzf "Transformer TensorFlow 2 Default v1.tar.gz" -C app/
-mv app/my-model app/transformer-model
+# Clone the repository
+git clone https://github.com/abdelrahman-abdelmoaty/en-es-translation-model-benchmark.git
+cd en-es-translation-model-benchmark/app
+
+# Build and start the application
+docker compose up --build
 ```
 
-#### Option 2: Download from Kaggle
+The application will be available at `http://localhost:8000`
 
-The model weights are available on Kaggle:
-
-- **Transformer Model**: [Kaggle Models - Transformer (Helsinki)](https://www.kaggle.com/models/yassienwasfy/transformer/)
-
-After downloading, extract to `app/transformer-model/`
-
-#### Option 3: Use Git LFS (For Repository Maintainers)
-
-If you want to include model files in the repository using Git LFS:
+To stop the application:
 
 ```bash
-# Install Git LFS
-brew install git-lfs  # macOS
-# or
-sudo apt install git-lfs  # Linux
-
-# Initialize Git LFS
-git lfs install
-
-# Track model files
-git lfs track "app/transformer-model/*.h5"
-git lfs track "app/transformer-model/**"
-
-# Add and commit
-git add .gitattributes
-git add app/transformer-model/
-git commit -m "Add model files via Git LFS"
+docker compose down
 ```
 
-**Note:** Git LFS has storage quotas on free GitHub accounts (1 GB storage, 1 GB bandwidth/month).
+**Note:** The model files (~300 MB) are stored using Git LFS and will be automatically downloaded when you clone the repository.
 
 ### Project Structure
 
@@ -111,7 +86,7 @@ en-es-translation-model-benchmark/
 
 The API and frontend are served directly by FastAPI:
 
-- `GET http://localhost:8000/health` - Health check endpoint
+- `GET http://localhost:8000/api/health` - Health check endpoint
 - `POST http://localhost:8000/api/translate` - Translate English text to Spanish
 - `GET http://localhost:8000/` - Frontend web interface
 
@@ -127,7 +102,7 @@ curl -X POST http://localhost:8000/api/translate \
 
 ```bash
 # Health check
-curl https://translation-app-production-0d36.up.railway.app/health
+curl https://translation-app-production-0d36.up.railway.app/api/health
 
 # Translation
 curl -X POST https://translation-app-production-0d36.up.railway.app/api/translate \
@@ -138,61 +113,4 @@ curl -X POST https://translation-app-production-0d36.up.railway.app/api/translat
 curl -X POST https://translation-app-production-0d36.up.railway.app/api/translate \
   -H "Content-Type: application/json" \
   -d '{"text": "The weather is nice today."}' | jq
-```
-<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
-read_file
-
-## 📦 Running the Application
-
-This is the easiest way to run the application with all dependencies containerized.
-
-#### Step 1: Navigate to the app directory
-
-```bash
-cd app
-```
-
-#### Step 2: Build and start the application
-
-```bash
-docker-compose up --build
-```
-
-This will:
-
-- Build the Docker image (includes model files, backend, and frontend)
-- Start the FastAPI container (serves both API and frontend)
-
-#### Step 3: Access the application
-
-- Open your browser and navigate to `http://localhost:8000`
-- The frontend and API are both served on port 8000
-
-#### Step 4: Stop the application
-
-```bash
-# Press Ctrl+C in the terminal, or in a new terminal:
-docker-compose down
-```
-
-#### Additional Docker Commands
-
-```bash
-# Run in detached mode (background)
-docker-compose up -d --build
-
-# View logs
-docker-compose logs -f
-
-# View logs for the service
-docker-compose logs -f backend
-
-# Stop and remove containers
-docker-compose down
-
-# Stop and remove containers, volumes, and images
-docker-compose down -v --rmi all
-
-# Rebuild without cache
-docker-compose build --no-cache
 ```

@@ -4,7 +4,7 @@ dockerfilePath = "Dockerfile"
 buildCommand = "git lfs install && git lfs pull"
 
 [deploy]
-healthcheckPath = "/health"
+healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 
