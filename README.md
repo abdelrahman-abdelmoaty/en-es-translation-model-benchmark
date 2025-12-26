@@ -102,24 +102,18 @@ en-es-translation-model-benchmark/
 │   ├── frontend/        # HTML/CSS/JS frontend
 │   ├── transformer-model/        # Transformer model files
 │   ├── docker-compose.yml
-│   └── nginx.conf
+│   └── Dockerfile       # Railway deployment Dockerfile
 ├── *.ipynb              # Jupyter notebooks (experiments)
 └── README.md
 ```
 
 ### API Endpoints
 
-The API can be accessed in two ways:
-
-**Via Nginx (recommended for frontend):**
-
-- `GET http://localhost/api/health` - Health check endpoint
-- `POST http://localhost/api/translate` - Translate English text to Spanish
-
-**Direct API access (bypassing nginx):**
+The API and frontend are served directly by FastAPI:
 
 - `GET http://localhost:8000/health` - Health check endpoint
 - `POST http://localhost:8000/translate` - Translate English text to Spanish
+- `GET http://localhost:8000/` - Frontend web interface
 
 **Example API request (local):**
 
@@ -164,16 +158,13 @@ docker-compose up --build
 
 This will:
 
-- Build the backend Docker image (includes model files)
-- Start the FastAPI backend container
-- Start the Nginx frontend container
-- Set up networking between services
+- Build the Docker image (includes model files, backend, and frontend)
+- Start the FastAPI container (serves both API and frontend)
 
 #### Step 3: Access the application
 
-- Open your browser and navigate to `http://localhost`
-- The frontend will be served on port 80
-- The API backend runs on port 8000 (internal, proxied through Nginx)
+- Open your browser and navigate to `http://localhost:8000`
+- The frontend and API are both served on port 8000
 
 #### Step 4: Stop the application
 
@@ -191,9 +182,8 @@ docker-compose up -d --build
 # View logs
 docker-compose logs -f
 
-# View logs for specific service
+# View logs for the service
 docker-compose logs -f backend
-docker-compose logs -f nginx
 
 # Stop and remove containers
 docker-compose down

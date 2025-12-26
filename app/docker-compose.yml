@@ -4,36 +4,18 @@ services:
   backend:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile
-    container_name: translation-backend
+      dockerfile: ./Dockerfile
+    container_name: translation-app
     ports:
-      - "8000:8000"  # Expose API directly
+      - "8000:8000"  # Expose API and frontend
     environment:
       - MODEL_PATH=/app/model/transformer-model
       - MAX_LENGTH=50
       - NUM_BEAMS=4
-    networks:
-      - translation-network
+      - PORT=8000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  nginx:
-    image: nginx:alpine
-    container_name: translation-frontend
-    ports:
-      - "80:80"
-    volumes:
-      - ./frontend:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - backend
-    networks:
-      - translation-network
-
-networks:
-  translation-network:
-    driver: bridge
 
