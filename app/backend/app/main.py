@@ -60,7 +60,7 @@ async def health_check():
     )
 
 
-@app.post("/translate", response_model=TranslationResponse)
+@app.post("/api/translate", response_model=TranslationResponse)
 async def translate(request: TranslationRequest):
     """
     Translate English text to Spanish.

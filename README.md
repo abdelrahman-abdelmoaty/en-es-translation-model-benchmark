@@ -112,13 +112,13 @@ en-es-translation-model-benchmark/
 The API and frontend are served directly by FastAPI:
 
 - `GET http://localhost:8000/health` - Health check endpoint
-- `POST http://localhost:8000/translate` - Translate English text to Spanish
+- `POST http://localhost:8000/api/translate` - Translate English text to Spanish
 - `GET http://localhost:8000/` - Frontend web interface
 
 **Example API request (local):**
 
 ```bash
-curl -X POST http://localhost:8000/translate \
+curl -X POST http://localhost:8000/api/translate \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello, how are you?"}'
 ```
@@ -130,15 +130,17 @@ curl -X POST http://localhost:8000/translate \
 curl https://translation-app-production-0d36.up.railway.app/health
 
 # Translation
-curl -X POST https://translation-app-production-0d36.up.railway.app/translate \
+curl -X POST https://translation-app-production-0d36.up.railway.app/api/translate \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello, how are you?"}'
 
 # Translation with pretty output (requires jq)
-curl -X POST https://translation-app-production-0d36.up.railway.app/translate \
+curl -X POST https://translation-app-production-0d36.up.railway.app/api/translate \
   -H "Content-Type: application/json" \
   -d '{"text": "The weather is nice today."}' | jq
 ```
+<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
+read_file
 
 ## 📦 Running the Application
 
