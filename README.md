@@ -7,6 +7,8 @@ The focus is on comparing different architectures using **BLEU score** as the pr
 
 ## 🔗 Important Links
 
+- 🌐 **Live Application**: [English to Spanish Translator](https://translation-app-production-0d36.up.railway.app/)
+- 🔌 **Live API**: [API Base URL](https://translation-app-production-0d36.up.railway.app/)
 - 📄 **Reference**: [TF Tutorial](https://www.tensorflow.org/text/tutorials/nmt_with_attention)
 - 💻 **Model Weights**:
   - **Transformer**: [Transformer (Hilsenki) Weights](https://www.kaggle.com/models/yassienwasfy/transformer/)
@@ -119,7 +121,7 @@ The API can be accessed in two ways:
 - `GET http://localhost:8000/health` - Health check endpoint
 - `POST http://localhost:8000/translate` - Translate English text to Spanish
 
-**Example API request:**
+**Example API request (local):**
 
 ```bash
 curl -X POST http://localhost:8000/translate \
@@ -127,12 +129,21 @@ curl -X POST http://localhost:8000/translate \
   -d '{"text": "Hello, how are you?"}'
 ```
 
-Or via nginx:
+**Example API request (live/production):**
 
 ```bash
-curl -X POST http://localhost/api/translate \
+# Health check
+curl https://translation-app-production-0d36.up.railway.app/health
+
+# Translation
+curl -X POST https://translation-app-production-0d36.up.railway.app/translate \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello, how are you?"}'
+
+# Translation with pretty output (requires jq)
+curl -X POST https://translation-app-production-0d36.up.railway.app/translate \
+  -H "Content-Type: application/json" \
+  -d '{"text": "The weather is nice today."}' | jq
 ```
 
 ## 📦 Running the Application
