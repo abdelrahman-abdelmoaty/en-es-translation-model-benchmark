@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from .model import translate_text, load_model
 from .config import API_HOST, API_PORT
 import uvicorn
@@ -28,6 +28,20 @@ app.add_middleware(
 # Request/Response models
 class TranslationRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=500, description="English text to translate")
+    
+    @field_validator('text')
+    @classmethod
+    def validate_text(cls, v: str) -> str:
+        """Validate that text is not empty or whitespace-only."""
+        if not v or not v.strip():
+            raise ValueError("Text cannot be empty or contain only whitespace")
+        # Strip whitespace and return cleaned text
+        cleaned = v.strip()
+        if len(cleaned) == 0:
+            raise ValueError("Text cannot be empty after removing whitespace")
+        if len(cleaned) > 500:
+            raise ValueError("Text cannot exceed 500 characters")
+        return cleaned
 
 
 class TranslationResponse(BaseModel):
@@ -71,11 +85,30 @@ async def translate(request: TranslationRequest):
     Returns:
         TranslationResponse with original and translated text
     """
+    # Additional server-side validation (backup to Pydantic validation)
+    if not request.text or not request.text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Text cannot be empty or contain only whitespace"
+        )
+    
+    if len(request.text) > 500:
+        raise HTTPException(
+            status_code=400,
+            detail="Text cannot exceed 500 characters"
+        )
+    
     try:
         translated = translate_text(request.text)
         return TranslationResponse(
             original_text=request.text,
             translated_text=translated
+        )
+    except ValueError as e:
+        # Handle validation errors from model layer
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid input: {str(e)}"
         )
     except Exception as e:
         raise HTTPException(
