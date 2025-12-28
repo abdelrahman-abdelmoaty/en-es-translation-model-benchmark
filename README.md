@@ -24,7 +24,8 @@ The following table summarizes the BLEU scores obtained by three different model
 | ------- | ------------------ | ---------- |
 | Model 1 | (RNN + Attention)  | **20.67**  |
 | Model 2 | (LSTM + Attention) | **21.47**  |
-| Model 3 | (LSTM + Attention) | **24.06**  |
+| Model 3 | (GRU + Attention) | **24.06**  |
+| Model 4 | (Transformer) | **50.12**  |
 
 ---
 
